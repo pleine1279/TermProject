@@ -208,7 +208,27 @@ void draw_box2(int x1, int y1, int x2, int y2, char* ch)
 
 void init()
 {
-	
+	cls(BLACK, WHITE);
+	FILE* ifile;
+	char title[32];
+	ifile = fopen("title2.txt", "r");
+
+	system("mode can cols=130");
+	while (fgets(title, 121, ifile) != NULL)
+	{
+		printf(title);
+	}
+	fclose(ifile);
+	while (1)
+	{
+		gotoxy();
+		printf("Enter Any Press");
+		Sleep(500);
+		putchar(BLANK);
+		Sleep(500);
+		if (getch())
+			break;
+	}
 }
 
 void main()
@@ -221,6 +241,8 @@ void main()
 	srand(time(NULL));
 	start_time = time(NULL);
 	last_remain_time = remain_time = time_out;	
+	init();
+	getchar();
 	while (1) {
 		// ½Ã°£ check
 		run_time = time(NULL) - start_time;

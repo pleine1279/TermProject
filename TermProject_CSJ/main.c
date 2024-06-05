@@ -1,11 +1,10 @@
-#include <stdio.h>
+ï»¿#include <stdio.h>
 #include <conio.h>
 #include <Windows.h>
 #include <time.h>
-#include <stdio.h>
 #include <stdlib.h>
 
-// »ö»ó Á¤ÀÇ
+// ìƒ‰ìƒ ì •ì˜
 #define BLACK	0
 #define BLUE1	1
 #define GREEN1	2
@@ -23,31 +22,31 @@
 #define YELLOW2	14
 #define WHITE	15
 
-#define STAR1 'O' // player1 Ç¥½Ã
-#define BLANK ' ' // ' ' ·ÎÇÏ¸é ÈçÀûÀÌ Áö¿öÁø´Ù 
+#define STAR1 'O' // player1 í‘œì‹œ
+#define BLANK ' ' // ' ' ë¡œí•˜ë©´ í”ì ì´ ì§€ì›Œì§„ë‹¤ 
 
-#define ESC 0x1b //  ESC ´©¸£¸é Á¾·á
+#define ESC 0x1b //  ESC ëˆ„ë¥´ë©´ ì¢…ë£Œ
 
-#define SPECIAL1 0xe0 // Æ¯¼öÅ°´Â 0xe0 + key °ªÀ¸·Î ±¸¼ºµÈ´Ù.
-#define SPECIAL2 0x00 // keypad °æ¿ì 0x00 + key ·Î ±¸¼ºµÈ´Ù.
+#define SPECIAL1 0xe0 // íŠ¹ìˆ˜í‚¤ëŠ” 0xe0 + key ê°’ìœ¼ë¡œ êµ¬ì„±ëœë‹¤.
+#define SPECIAL2 0x00 // keypad ê²½ìš° 0x00 + key ë¡œ êµ¬ì„±ëœë‹¤.
 
-#define UP  0x48 // Up key´Â 0xe0 + 0x48 µÎ°³ÀÇ °ªÀÌ µé¾î¿Â´Ù.
+#define UP  0x48 // Up keyëŠ” 0xe0 + 0x48 ë‘ê°œì˜ ê°’ì´ ë“¤ì–´ì˜¨ë‹¤.
 #define DOWN 0x50
 #define LEFT 0x4b
 #define RIGHT 0x4d
 
-#define WIDTH 80
-#define HEIGHT 24
+#define WIDTH 140
+#define HEIGHT 60
 
-int Delay = 100; // 100 msec delay, ÀÌ °ªÀ» ÁÙÀÌ¸é ¼Óµµ°¡ »¡¶óÁø´Ù.
-int keep_moving = 1; // 1:°è¼ÓÀÌµ¿, 0:ÇÑÄ­¾¿ÀÌµ¿.
-int time_out = 30; // Á¦ÇÑ½Ã°£
+int Delay = 100; // 100 msec delay, ì´ ê°’ì„ ì¤„ì´ë©´ ì†ë„ê°€ ë¹¨ë¼ì§„ë‹¤.
+int keep_moving = 1; // 1:ê³„ì†ì´ë™, 0:í•œì¹¸ì”©ì´ë™.
+int time_out = 30; // ì œí•œì‹œê°„
 int score[2] = { 0 };
-int golds[WIDTH][HEIGHT] = { 0 }; // 1ÀÌ¸é Gold ÀÖ´Ù´Â ¶æ
-int goldinterval = 3; // GOLD Ç¥½Ã °£°İ
+int golds[WIDTH][HEIGHT] = { 0 }; // 1ì´ë©´ Gold ìˆë‹¤ëŠ” ëœ»
+int goldinterval = 3; // GOLD í‘œì‹œ ê°„ê²©
 int called[2];
 
-void removeCursor(void) { // Ä¿¼­¸¦ ¾Èº¸ÀÌ°Ô ÇÑ´Ù
+void removeCursor(void) { // ì»¤ì„œë¥¼ ì•ˆë³´ì´ê²Œ í•œë‹¤
 
 	CONSOLE_CURSOR_INFO curInfo;
 	GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
@@ -55,10 +54,10 @@ void removeCursor(void) { // Ä¿¼­¸¦ ¾Èº¸ÀÌ°Ô ÇÑ´Ù
 	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
 }
 
-void gotoxy(int x, int y) //³»°¡ ¿øÇÏ´Â À§Ä¡·Î Ä¿¼­ ÀÌµ¿
+void gotoxy(int x, int y) //ë‚´ê°€ ì›í•˜ëŠ” ìœ„ì¹˜ë¡œ ì»¤ì„œ ì´ë™
 {
 	COORD pos = { x, y };
-	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);// WIN32API ÇÔ¼öÀÔ´Ï´Ù. ÀÌ°Ç ¾ËÇÊ¿ä ¾ø¾î¿ä
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);// WIN32API í•¨ìˆ˜ì…ë‹ˆë‹¤. ì´ê±´ ì•Œí•„ìš” ì—†ì–´ìš”
 }
 
 void putstar(int x, int y, char ch)
@@ -76,7 +75,7 @@ void textcolor(int fg_color, int bg_color)
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), fg_color | bg_color << 4);
 }
-// È­¸é Áö¿ì±â°í ¿øÇÏ´Â ¹è°æ»öÀ¸·Î ¼³Á¤ÇÑ´Ù.
+// í™”ë©´ ì§€ìš°ê¸°ê³  ì›í•˜ëŠ” ë°°ê²½ìƒ‰ìœ¼ë¡œ ì„¤ì •í•œë‹¤.
 void cls(int bg_color, int text_color)
 {
 	char cmd[100];
@@ -107,7 +106,7 @@ void player1(unsigned char ch)
 	int move_flag = 0;
 	static unsigned char last_ch = 0;
 
-	if (called[0] == 0) { // Ã³À½ ¶Ç´Â Restart
+	if (called[0] == 0) { // ì²˜ìŒ ë˜ëŠ” Restart
 		oldx = 60, oldy = 10, newx = 60, newy = 10;
 		putstar(oldx, oldy, STAR1);
 		called[0] = 1;
@@ -120,9 +119,9 @@ void player1(unsigned char ch)
 
 	switch (ch) {
 	case UP:
-		if (oldy > 1) // 0 Àº Status Line
+		if (oldy > 1) // 0 ì€ Status Line
 			newy = oldy - 1;
-		else { // º®¿¡ ºÎµóÄ¡¸é ¹æÇâÀ» ¹İ´ë·Î ÀÌµ¿
+		else { // ë²½ì— ë¶€ë”›ì¹˜ë©´ ë°©í–¥ì„ ë°˜ëŒ€ë¡œ ì´ë™
 			newy = oldy + 1;
 			last_ch = DOWN;
 		}
@@ -157,9 +156,9 @@ void player1(unsigned char ch)
 		break;
 	}
 	if (move_flag) {
-		erasestar(oldx, oldy); // ¸¶Áö¸· À§Ä¡ÀÇ * ¸¦ Áö¿ì°í
-		putstar(newx, newy, STAR1); // »õ·Î¿î À§Ä¡¿¡¼­ * ¸¦ Ç¥½ÃÇÑ´Ù.
-		oldx = newx; // ¸¶Áö¸· À§Ä¡¸¦ ±â¾ïÇÑ´Ù.
+		erasestar(oldx, oldy); // ë§ˆì§€ë§‰ ìœ„ì¹˜ì˜ * ë¥¼ ì§€ìš°ê³ 
+		putstar(newx, newy, STAR1); // ìƒˆë¡œìš´ ìœ„ì¹˜ì—ì„œ * ë¥¼ í‘œì‹œí•œë‹¤.
+		oldx = newx; // ë§ˆì§€ë§‰ ìœ„ì¹˜ë¥¼ ê¸°ì–µí•œë‹¤.
 		oldy = newy;
 		if (golds[newx][newy]) {
 			score[0]++;
@@ -174,7 +173,7 @@ void show_gold()
 {
 	int x, y;
 	x = rand() % WIDTH;
-	y = rand() % (HEIGHT - 1) + 1;  // Á¦ÀÏ »ó´ÜÀº ÇÇÇÑ´Ù
+	y = rand() % (HEIGHT - 1) + 1;  // ì œì¼ ìƒë‹¨ì€ í”¼í•œë‹¤
 	textcolor(YELLOW2, BLACK);
 	gotoxy(x, y);
 	printf(GOLD);
@@ -185,7 +184,7 @@ void show_gold()
 void show_time(int remain_time)
 {
 	gotoxy(30, 0);
-	printf("³²Àº½Ã°£ : %d", remain_time);
+	printf("ë‚¨ì€ì‹œê°„ : %d", remain_time);
 }
 
 void draw_box2(int x1, int y1, int x2, int y2, char* ch)
@@ -208,32 +207,42 @@ void draw_box2(int x1, int y1, int x2, int y2, char* ch)
 
 void init()
 {
-	cls(BLACK, WHITE);
-	FILE* ifile;
-	char title[32];
-	ifile = fopen("title2.txt", "r");
+	system("mode con cols=110 lines=40");
+	cls(BLACK, YELLOW1);
+	removeCursor();
 
-	system("mode can cols=130");
-	while (fgets(title, 121, ifile) != NULL)
-	{
-		printf(title);
-	}
-	fclose(ifile);
+	gotoxy(5, 10);
+	printf("â– â– â– â– ã€€ã€€ã€€ã€€ã€€â– ã€€ã€€ã€€ã€€ã€€ ã€€â– â– â– â– ã€€ã€€ã€€ã€€ ã€€ã€€â– ã€€ã€€ã€€ã€€ã€€â– ã€€ã€€ã€€ã€€â– ã€€ã€€ã€€ã€€â– ã€€ã€€ã€€â– â– ");
+	gotoxy(5, 11);
+	printf("â– â– â– â– â– ã€€  ã€€ â– â– ã€€ã€€ã€€ã€€  â– â– â– â– â– â– ã€€ã€€ã€€ã€€ ã€€â– â– ã€€ã€€ã€€â– â– ã€€  ã€€ â– â– ã€€ã€€   â– â– ã€€ã€€â– â– ");
+	gotoxy(5, 12);
+	printf("â– â– ã€€â– â–       â– â– â– ã€€ã€€ã€€  â– â– â– â– â– ã€€ã€€ã€€ã€€ã€€ã€€  â– â– â– ã€€â– â– â–       â– â– â– ã€€ã€€ã€€â– â– â– ã€€â– â– ");
+	gotoxy(5, 13);
+	printf("â– â– â– â– â– ã€€   â– â– â– â– ã€€    â– â– â– â– ã€€ã€€ã€€ ã€€â– â– â– ã€€â– â– â– â– â– â– â–      â– â– â– â– ã€€ã€€ â– â– â– â– â– â– ");
+	gotoxy(5, 14);
+	printf("â– â– â– â– ã€€ã€€ã€€â– â– ã€€â– â– ã€€ ã€€ â– â– â– â– â– ã€€ã€€ã€€ã€€ã€€ ã€€ â– â– â– â– â– â– â– ã€€ã€€â– â– ã€€â– â– ã€€ã€€â– â– â– â– â– â– ");
+	gotoxy(5, 15);
+	printf("â– â– ã€€ã€€ã€€   â– â– â– â– â– â– ã€€ã€€  â– â– â– â– â– â– ã€€ã€€ã€€ã€€   â– â– â– â– â– â– â–    â– â– â– â– â– â–    â– â– â– â– â– â– ");
+	gotoxy(5, 16);
+	printf("â– â– ã€€ã€€ã€€ã€€â– â– â– â– â– â– â– ã€€ã€€   â– â– â– â– ã€€ã€€ã€€ã€€     â– â– â– â– â– â– â– ã€€â– â– â– â– â– â– â– ã€€â– â– â– â– â– â– ");
+
 	while (1)
 	{
-		gotoxy();
-		printf("Enter Any Press");
+		gotoxy(43, 30);
+		printf("Press Any Key to Start");
 		Sleep(500);
-		putchar(BLANK);
+		gotoxy(43, 30);
+		printf("                       ");
 		Sleep(500);
-		if (getch())
+		if (_kbhit())
 			break;
 	}
+	cls(BLACK, WHITE);
 }
 
 void main()
 {
-	// Æ¯¼öÅ° 0xe0 À» ÀÔ·Â¹ŞÀ¸·Á¸é unsigned char ·Î ¼±¾ğÇØ¾ß ÇÔ
+	// íŠ¹ìˆ˜í‚¤ 0xe0 ì„ ì…ë ¥ë°›ìœ¼ë ¤ë©´ unsigned char ë¡œ ì„ ì–¸í•´ì•¼ í•¨
 	unsigned char ch;
 	int run_time, start_time, remain_time, last_remain_time;
 	int gold_time = 0;
@@ -242,30 +251,29 @@ void main()
 	start_time = time(NULL);
 	last_remain_time = remain_time = time_out;	
 	init();
-	getchar();
 	while (1) {
-		// ½Ã°£ check
+		// ì‹œê°„ check
 		run_time = time(NULL) - start_time;
 		remain_time = time_out - run_time;
 		if (remain_time < last_remain_time) {
-			// ³²Àº½Ã°£À» Ç¥½ÃÇÑ´Ù.
-			show_time(remain_time); // ½Ã°£ÀÌ º¯ÇÒ¶§¸¸ Ãâ·Â
+			// ë‚¨ì€ì‹œê°„ì„ í‘œì‹œí•œë‹¤.
+			show_time(remain_time); // ì‹œê°„ì´ ë³€í• ë•Œë§Œ ì¶œë ¥
 			last_remain_time = remain_time;
 		}
-		if (remain_time == 0) // ½Ã°£ Á¾·á
+		if (remain_time == 0) // ì‹œê°„ ì¢…ë£Œ
 			break;
 
-		if (kbhit() == 1) {  // Å°º¸µå°¡ ´­·ÁÁ® ÀÖÀ¸¸é
-			ch = getch(); // key °ªÀ» ÀĞ´Â´Ù
+		if (kbhit() == 1) {  // í‚¤ë³´ë“œê°€ ëˆŒë ¤ì ¸ ìˆìœ¼ë©´
+			ch = getch(); // key ê°’ì„ ì½ëŠ”ë‹¤
 			//
-			// ESC ´©¸£¸é ÇÁ·Î±×·¥ Á¾·á
+			// ESC ëˆ„ë¥´ë©´ í”„ë¡œê·¸ë¨ ì¢…ë£Œ
 			if (ch == ESC)
 				break;
 			//
-			if (ch == SPECIAL1 || ch == SPECIAL2) { // ¸¸¾à Æ¯¼öÅ°
-				// ¿¹¸¦ µé¾î UP keyÀÇ °æ¿ì 0xe0 0x48 µÎ°³ÀÇ ¹®ÀÚ°¡ µé¾î¿Â´Ù.
+			if (ch == SPECIAL1 || ch == SPECIAL2) { // ë§Œì•½ íŠ¹ìˆ˜í‚¤
+				// ì˜ˆë¥¼ ë“¤ì–´ UP keyì˜ ê²½ìš° 0xe0 0x48 ë‘ê°œì˜ ë¬¸ìê°€ ë“¤ì–´ì˜¨ë‹¤.
 				ch = getch();
-				// Player1Àº ¹æÇâÅ°·Î ¿òÁ÷ÀÎ´Ù.
+				// Player1ì€ ë°©í–¥í‚¤ë¡œ ì›€ì§ì¸ë‹¤.
 				switch (ch) {
 				case UP:
 				case DOWN:
@@ -273,7 +281,7 @@ void main()
 				case RIGHT:
 					player1(ch);
 					break;
-				default:// Æ¯¼öÅ° ÀÌÁö¸¸ ¹æÇâÅ°°¡ ¾Æ´Ñ °æ¿ì
+				default:// íŠ¹ìˆ˜í‚¤ ì´ì§€ë§Œ ë°©í–¥í‚¤ê°€ ì•„ë‹Œ ê²½ìš°
 					player1(0);
 				}
 			}
@@ -283,10 +291,10 @@ void main()
 			}
 		}
 		else {
-			// keyboard °¡ ´­·ÁÁöÁö ¾ÊÀ¸¸é °è¼Ó ¿òÁ÷ÀÎ´Ù.
-			// ÀÌµ¿ÁßÀÌ´ø ¹æÇâÀ¸·Î °è¼Ó ÀÌµ¿
+			// keyboard ê°€ ëˆŒë ¤ì§€ì§€ ì•Šìœ¼ë©´ ê³„ì† ì›€ì§ì¸ë‹¤.
+			// ì´ë™ì¤‘ì´ë˜ ë°©í–¥ìœ¼ë¡œ ê³„ì† ì´ë™
 			player1(0);
 		}
-		Sleep(Delay); // Delay¸¦ ÁÙÀÌ¸é ¼Óµµ°¡ »¡¶óÁø´Ù
+		Sleep(Delay); // Delayë¥¼ ì¤„ì´ë©´ ì†ë„ê°€ ë¹¨ë¼ì§„ë‹¤
 	}
 }

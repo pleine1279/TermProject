@@ -46,7 +46,7 @@ int mt1 = 99;
 int mt2 = 99;
 int mt3 = 99;
 int mt4 = 99;
-int p_x, p_y, m1_x, m1_y, m2_x, m2_y, m3_x, m3_y, m4_x, m4_y;
+int p_x = 26, p_y = 23, m1_x = 12, m1_y = 5, m2_x = 42, m2_y = 5, m3_x = 12, m3_y = 26, m4_x = 42, m4_y = 26;
 
 void removeCursor(void) { // 커서를 안보이게 한다
 
